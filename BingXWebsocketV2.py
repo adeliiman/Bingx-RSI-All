@@ -5,9 +5,9 @@ import pandas_ta as ta
 import numpy as np
 import pandas as pd
 
-class Bing:
-    symbols = {}
-bing = Bing()
+from setLogger import get_logger
+logger = get_logger(__name__)
+
 
 
 with open('config.json') as f:
@@ -52,17 +52,19 @@ class BingxWS:
     def on_message(self, ws, msg):
         data = gzip.decompress(msg)
         data = str(data,'utf-8')
+        if self.Bingx.bot == "Stop":
+            self.stop()
         if data == "Ping":
             ws.send("Pong")
-            if int(time.strftime('%M', time.localtime(time.time()))) % 30 == 0 and (not self.extendListenKeyStatus):
-                #print('its time to extend key .... .... .... .... .... .... ... ... ...')
-                self.extendListenKey()
-                self.extendListenKeyStatus = True
-            elif int(time.strftime('%M', time.localtime(time.time()))) % 30 != 0:
-                self.extendListenKeyStatus = False
+            # if int(time.strftime('%M', time.localtime(time.time()))) % 30 == 0 and (not self.extendListenKeyStatus):
+            #     #print('its time to extend key .... .... .... .... .... .... ... ... ...')
+            #     self.extendListenKey()
+            #     self.extendListenKeyStatus = True
+            # elif int(time.strftime('%M', time.localtime(time.time()))) % 30 != 0:
+            #     self.extendListenKeyStatus = False
         else:
             #print(data)
-            self.handeler(data)
+            self.handeler(data, self.Bingx)
 
 
     def on_error(self, ws, error):
@@ -100,26 +102,87 @@ class BingxWS:
 
 
 
-def start_bingx(data):
+def start_bingx(data, Bingx):
     subscribe = []
     for symbol in data:
-        subscribe.append({f"id":"BTC@trade", "reqType": "sub", "dataType":f"{symbol}@kline_1m"})
+        subscribe.append({f"id":f"{symbol}", "reqType": "sub", "dataType":f"{symbol}@kline_{Bingx.timeframe}"})
         
-    bingxWS = BingxWS(handler=handler, sub=subscribe)
+    bingxWS = BingxWS(handler=handler, sub=subscribe, Bingx=Bingx)
     bingxWS.start()
 
 
-def handler(data):
-    res = json.loads(data)
-    symbol = res['dataType'].split("@")[0]
-    close = float(res['data'][0]['c'])
-    df = pd.DataFrame([close, *bing.symbols[symbol][1:] ][::-1], columns=['close'])
-    rsi = ta.rsi(close=df['close'], length=14)
+async def schedule_jobs(Bingx):
+    second_ = time.gmtime().tm_sec
+    min_ = time.gmtime().tm_min
+    hour_ = time.gmtime().tm_hour
 
-    print(symbol, close, rsi.iat[-1])
+    if not Bingx.kline:
+        if Bingx.timeframe == "1m" and (second_ < 2):
+            Bingx.kline = True
+            Bingx.get_kline = False
+        elif Bingx.timeframe == "5m" and (min_ % 5 == 0):
+            Bingx.kline = True
+            Bingx.get_kline = False
+        elif Bingx.timeframe == "15m" and (min_ % 15 == 0):
+            Bingx.kline = True 
+            Bingx.get_kline = False
+        elif Bingx.timeframe == "30m" and (min_ % 30 == 0):
+            Bingx.kline = True
+            Bingx.get_kline = False
+        elif Bingx.timeframe == "1h" and (hour_ == 0):
+            Bingx.kline = True
+            Bingx.get_kline = False
+        elif Bingx.timeframe == "4h" and (hour_ % 4 == 0):
+            Bingx.kline = True
+            Bingx.get_kline = False
+    else:
+        if Bingx.timeframe == "1m" and (second_ > 0):
+            Bingx.kline = False
+        elif Bingx.timeframe == "5m" and (min_ % 5 != 0):
+            Bingx.kline = False
+        elif Bingx.timeframe == "15m" and (min_ % 15 != 0):
+            Bingx.kline = False 
+        elif Bingx.timeframe == "30m" and (min_ % 30 != 0):
+            Bingx.kline = False
+        elif Bingx.timeframe == "1h" and (hour_ != 0):
+            Bingx.kline = False
+        elif Bingx.timeframe == "4h" and (hour_ % 4 != 0):
+            Bingx.kline = False
+
+
+
+async def request(Bingx):
+    import httpx
+    client = httpx.AsyncClient()
+    r = await client.get(f"http://0.0.0.0:8000/update_klines", 
+    headers={'accept' : 'application/json'})
+
+
+def handler(data, Bingx):
+    try:
+        schedule_jobs(Bingx)
+
+        if Bingx.get_kline:
+            data = json.loads(data) # code/ dataType/ s/ data: c/o/h/l/c/v/T
+            # print(data)
+
+            symbol = data['s']
+            close = float(data['data'][0]['c'])
+            t = data['data'][0]['T']
+            df = pd.DataFrame([close, *Bingx.close[symbol][1:] ][::-1], columns=['close'])
+            rsi = ta.rsi(close=df['close'], length=14)
+
+            print(symbol, close, rsi.iat[-1], t)
+        else:
+            print("please wait, we are update klines.")
+            request(Bingx)
+    except Exception as e:
+        logger.exception(f"{e}")
+            
     
-    
 
-
-# threading.Thread(target=start_bingx, symbols).start()
+def main_job(Bingx):
+    # symbols = ['BTC-USDT']
+    symbols = Bingx.symbols
+    start_bingx(symbols, Bingx)
 

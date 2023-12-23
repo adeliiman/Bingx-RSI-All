@@ -11,21 +11,22 @@ import wtforms
 class Setting(Base):
     __tablename__ = "setting"
     id = Column(Integer,primary_key=True)  
-    timeframe = Column(String, default='15min')
+    timeframe = Column(String, default='15m')
     leverage = Column(Integer, default=10)
     TP_percent = Column(Float, default=1)
     SL_percent = Column(Float, default=1)
+    use_symbols = Column(String, default='all-symbols')
 
 
 class SettingAdmin(ModelView, model=Setting):
     #form_columns = [User.name]
-    column_list = [Setting.timeframe, Setting.leverage, Setting.TP_percent, Setting.SL_percent]
+    column_list = [Setting.timeframe, Setting.leverage, Setting.TP_percent, Setting.SL_percent, Setting.use_symbols]
     name = "Setting"
     name_plural = "Setting"
     icon = "fa-solid fa-user"
-    form_args = dict(timeframe=dict(default="15min", choices=["15min", "5min", "1hour", "4hour"]), 
-                     )
-    form_overrides =  dict(timeframe=wtforms.SelectField)
+    form_args = dict(timeframe=dict(default="15m", choices=["15m", "5m", "1h", "4h", "1m"]), 
+                     use_symbols=dict(default='All-symbols', choices=["all-symbols", "user-symbols"]))
+    form_overrides =  dict(timeframe=wtforms.SelectField, use_symbols=wtforms.SelectField)
 
     # async def on_model_change(self, data, model, is_created):
     #     # Perform some other action
@@ -66,19 +67,20 @@ class SignalAdmin(ModelView, model=Signal):
         pass
 
 
-class Symbols(Base):
-    __tablename__ = "symbols"
+class UserSymbols(Base):
+    __tablename__ = "user-symbols"
     id = Column(Integer,primary_key=True)
     symbol = Column(String)
 
-class SymbolAdmin(ModelView, model=Symbols):
-    column_list = [Symbols.id, Symbols.symbol
+class UserSymbolAdmin(ModelView, model=UserSymbols):
+    column_list = [UserSymbols.id, UserSymbols.symbol
                    ]
-    name = "Symbol"
-    name_plural = "Symbol"
+    name = "symbol"
+    name_plural = "User Symbols"
     icon = "fa-sharp fa-solid fa-bitcoin-sign"
-    column_sortable_list = [Symbols.symbol]
-    column_searchable_list = [Symbols.symbol]
+    column_sortable_list = [UserSymbols.symbol, UserSymbols.id]
+    column_searchable_list = [UserSymbols.symbol, UserSymbols.id]
+    page_size = 100
     # form_overrides = dict(symbol=wtforms.StringField, marginMode=wtforms.SelectField)
     # form_args = dict(symbol=dict(validators=[wtforms.validators.regexp('.+[A-Z]-USDT')], label="symbol(BTC-USDT)"),
     #                  marginMode=dict(choices=["Isolated", "Cross"]))
@@ -119,6 +121,33 @@ class ConfigAdmin(ModelView, model=Config):
     # async def on_model_delete(self, model):
     #     # Perform some other action
     #     pass
+
+
+class AllSymbols(Base):
+    __tablename__ = "all-symbols"
+    id = Column(Integer,primary_key=True)
+    symbol = Column(String)
+
+class AllSymbolAdmin(ModelView, model=AllSymbols):
+    column_list = [AllSymbols.id, AllSymbols.symbol
+                   ]
+    name = ""
+    name_plural = "All Symbols"
+    icon = "fa-sharp fa-solid fa-bitcoin-sign"
+    column_sortable_list = [AllSymbols.symbol, AllSymbols.id]
+    column_searchable_list = [AllSymbols.symbol, AllSymbols.id]
+    page_size = 20
+    # form_overrides = dict(symbol=wtforms.StringField, marginMode=wtforms.SelectField)
+    # form_args = dict(symbol=dict(validators=[wtforms.validators.regexp('.+[A-Z]-USDT')], label="symbol(BTC-USDT)"),
+    #                  marginMode=dict(choices=["Isolated", "Cross"]))
+    # async def on_model_change(self, data, model, is_created):
+    #     print(is_created)
+    #     from database import SessionLocal
+    #     db = SessionLocal()
+    #     symbol = db.query(Symbols).order_by(Symbols.id.desc()).first()
+    #     symbol.test = "iman"
+    #     db.commit()
+
 
 
 class ReportView(BaseView):

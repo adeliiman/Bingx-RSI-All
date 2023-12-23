@@ -18,11 +18,15 @@ api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=Fa
 
 class BingX:
 	bot: str = 'Stop' # 'Run'
+	kline : bool = False
 	timeframe: str = ''
 	leverage: int = 10
 	TP_percent: float = 2
 	SL_percent: float = 1
-	user_symbols: list = []
+	symbols: list = []
+
+	use_symbols : str = "all-symbols"
+	close : dict = {}
     
 	rsi_long : dict
 	rsi_long_levels : []
