@@ -6,6 +6,7 @@ import pandas as pandas
 import pandas_ta as ta
 import concurrent.futures
 from main import Bingx
+import time, asyncio
 
 
 
@@ -94,3 +95,65 @@ def add_all_symbols(db: Session):
     
     logger.info("add all symbols to SQl.")
     
+
+async def request_update_klines():
+    import httpx
+    client = httpx.AsyncClient()
+    r =  await client.get(f"http://0.0.0.0:8000/update_klines", 
+    headers={'accept' : 'application/json'})
+
+async def schedule_jobs():
+    from main import Bingx
+    while 1:
+        second_ = time.gmtime().tm_sec
+        print(second_, ...)
+        min_ = time.gmtime().tm_min
+        hour_ = time.gmtime().tm_hour
+
+        print(Bingx.kline, Bingx.get_kline)
+        if not Bingx.kline:
+            if Bingx.timeframe == "1m" and (second_ == 0):
+                Bingx.kline = True
+                Bingx.get_kline = False
+            elif Bingx.timeframe == "3m" and (min_ % 3 == 0):
+                Bingx.kline = True
+                Bingx.get_kline = False
+            elif Bingx.timeframe == "5m" and (min_ % 5 == 0):
+                Bingx.kline = True
+                Bingx.get_kline = False
+            elif Bingx.timeframe == "15m" and (min_ % 15 == 0):
+                Bingx.kline = True 
+                Bingx.get_kline = False
+            elif Bingx.timeframe == "30m" and (min_ % 30 == 0):
+                Bingx.kline = True
+                Bingx.get_kline = False
+            elif Bingx.timeframe == "1h" and (hour_ == 0):
+                Bingx.kline = True
+                Bingx.get_kline = False
+            elif Bingx.timeframe == "4h" and (hour_ % 4 == 0):
+                Bingx.kline = True
+                Bingx.get_kline = False
+        else:
+            if Bingx.timeframe == "1m" and (second_ != 0):
+                Bingx.kline = False
+            elif Bingx.timeframe == "3m" and (min_ % 3 != 0):
+                Bingx.kline = False
+            elif Bingx.timeframe == "5m" and (min_ % 5 != 0):
+                Bingx.kline = False
+            elif Bingx.timeframe == "15m" and (min_ % 15 != 0):
+                Bingx.kline = False 
+            elif Bingx.timeframe == "30m" and (min_ % 30 != 0):
+                Bingx.kline = False
+            elif Bingx.timeframe == "1h" and (hour_ != 0):
+                Bingx.kline = False
+            elif Bingx.timeframe == "4h" and (hour_ % 4 != 0):
+                Bingx.kline = False
+
+        if not Bingx.get_kline:
+            await request_update_klines()
+
+        print(Bingx.kline, Bingx.get_kline)
+
+        await asyncio.sleep(1)
+        if Bingx.bot == "Stop":
+            break

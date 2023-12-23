@@ -111,56 +111,9 @@ def start_bingx(data, Bingx):
     bingxWS.start()
 
 
-async def schedule_jobs(Bingx):
-    second_ = time.gmtime().tm_sec
-    min_ = time.gmtime().tm_min
-    hour_ = time.gmtime().tm_hour
-
-    if not Bingx.kline:
-        if Bingx.timeframe == "1m" and (second_ < 2):
-            Bingx.kline = True
-            Bingx.get_kline = False
-        elif Bingx.timeframe == "5m" and (min_ % 5 == 0):
-            Bingx.kline = True
-            Bingx.get_kline = False
-        elif Bingx.timeframe == "15m" and (min_ % 15 == 0):
-            Bingx.kline = True 
-            Bingx.get_kline = False
-        elif Bingx.timeframe == "30m" and (min_ % 30 == 0):
-            Bingx.kline = True
-            Bingx.get_kline = False
-        elif Bingx.timeframe == "1h" and (hour_ == 0):
-            Bingx.kline = True
-            Bingx.get_kline = False
-        elif Bingx.timeframe == "4h" and (hour_ % 4 == 0):
-            Bingx.kline = True
-            Bingx.get_kline = False
-    else:
-        if Bingx.timeframe == "1m" and (second_ > 0):
-            Bingx.kline = False
-        elif Bingx.timeframe == "5m" and (min_ % 5 != 0):
-            Bingx.kline = False
-        elif Bingx.timeframe == "15m" and (min_ % 15 != 0):
-            Bingx.kline = False 
-        elif Bingx.timeframe == "30m" and (min_ % 30 != 0):
-            Bingx.kline = False
-        elif Bingx.timeframe == "1h" and (hour_ != 0):
-            Bingx.kline = False
-        elif Bingx.timeframe == "4h" and (hour_ % 4 != 0):
-            Bingx.kline = False
-
-
-
-async def request(Bingx):
-    import httpx
-    client = httpx.AsyncClient()
-    r = await client.get(f"http://0.0.0.0:8000/update_klines", 
-    headers={'accept' : 'application/json'})
-
-
 def handler(data, Bingx):
     try:
-        schedule_jobs(Bingx)
+        symbol = json.loads(data)['s']
 
         if Bingx.get_kline:
             data = json.loads(data) # code/ dataType/ s/ data: c/o/h/l/c/v/T
@@ -175,7 +128,7 @@ def handler(data, Bingx):
             print(symbol, close, rsi.iat[-1], t)
         else:
             print("please wait, we are update klines.")
-            request(Bingx)
+            # request(Bingx)
     except Exception as e:
         logger.exception(f"{e}")
             

@@ -19,6 +19,7 @@ api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=Fa
 class BingX:
 	bot: str = 'Stop' # 'Run'
 	kline : bool = False
+	get_kline : bool = False
 	timeframe: str = ''
 	leverage: int = 10
 	TP_percent: float = 2

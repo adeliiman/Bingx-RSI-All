@@ -24,7 +24,7 @@ class SettingAdmin(ModelView, model=Setting):
     name = "Setting"
     name_plural = "Setting"
     icon = "fa-solid fa-user"
-    form_args = dict(timeframe=dict(default="15m", choices=["15m", "5m", "1h", "4h", "1m"]), 
+    form_args = dict(timeframe=dict(default="15m", choices=["15m", "5m", "1h", "4h", "1m", "3m"]), 
                      use_symbols=dict(default='All-symbols', choices=["all-symbols", "user-symbols"]))
     form_overrides =  dict(timeframe=wtforms.SelectField, use_symbols=wtforms.SelectField)
 
