@@ -34,6 +34,9 @@ class BingX:
 	rsi_short : dict
 	rsi_short_levels : []
 
+	position : str = ''
+	temp_pos : bool = False
+	entry_rsi : list = []
 
 
 Bingx = BingX()

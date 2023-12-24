@@ -20,7 +20,7 @@ def kline(items):
     print(symbol)
     interval = items[1]
     from main import api, Bingx
-    res = api.getKline(symbol=symbol, interval=interval, limit=100)
+    res = api.getKline(symbol=symbol, interval=interval, limit=400)
     # print(symbol, res['code'])
     close = []
     for data in res['data']:
@@ -106,11 +106,10 @@ async def schedule_jobs():
     from main import Bingx
     while 1:
         second_ = time.gmtime().tm_sec
-        print(second_, ...)
+        # print(second_, ...)
         min_ = time.gmtime().tm_min
         hour_ = time.gmtime().tm_hour
 
-        print(Bingx.kline, Bingx.get_kline)
         if not Bingx.kline:
             if Bingx.timeframe == "1m" and (second_ == 0):
                 Bingx.kline = True
@@ -151,8 +150,6 @@ async def schedule_jobs():
 
         if not Bingx.get_kline:
             await request_update_klines()
-
-        print(Bingx.kline, Bingx.get_kline)
 
         await asyncio.sleep(1)
         if Bingx.bot == "Stop":

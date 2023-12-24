@@ -109,6 +109,8 @@ class ConfigAdmin(ModelView, model=Config):
     name = "Config"
     name_plural = "Config"
     icon = "fa-solid fa-user"
+    column_searchable_list = [Config.margin, Config.rsi_level, Config.side, Config.id]
+    column_sortable_list = [Config.margin, Config.rsi_level, Config.side, Config.id]
     form_args = dict(side=dict(choices=["Long", "Short"]), 
                      )
     form_overrides =  dict(side=wtforms.SelectField)

@@ -113,29 +113,61 @@ def start_bingx(data, Bingx):
 
 def handler(data, Bingx):
     try:
-        symbol = json.loads(data)['s']
-
+        
         if Bingx.get_kline:
             data = json.loads(data) # code/ dataType/ s/ data: c/o/h/l/c/v/T
             # print(data)
-
             symbol = data['s']
             close = float(data['data'][0]['c'])
             t = data['data'][0]['T']
-            df = pd.DataFrame([close, *Bingx.close[symbol][1:] ][::-1], columns=['close'])
+
+            if Bingx.position and Bingx.position != symbol:
+                return None
+            if Bingx.temp_pos:
+                return None
+            
+            df = pd.DataFrame([close, *Bingx.close[symbol][1:]][::-1], columns=['close'])
             rsi = ta.rsi(close=df['close'], length=14)
 
-            print(symbol, close, rsi.iat[-1], t)
+            def cross_up():
+                for level in Bingx.rsi_long_levels:
+                    if round(rsi.iat[-1], 2) > level and round(rsi.iat[-2], 2) < level:
+                        Bingx.temp_pos = True
+                        logger.info(f"RSI up-cross: {round(rsi.iat[-1], 2)}")
+                        # Long
+                        # symbol, rsi, margin, side, price, time
+                        body = {"symbol": symbol, "rsi": round(rsi.iat[-1], 2),
+                                "side" : "Long", "margin" : Bingx.rsi_long[level], 
+                                "price" : close, "time" : t}
+                        from tasks import sender
+                        sender(body=json.dumps(body))
+            def cross_down():
+                for level in Bingx.rsi_short_levels:
+                    if round(rsi.iat[-1], 2) < level and round(rsi.iat[-2], 2) > level:
+                        Bingx.temp_pos = True
+                        logger.info(f"RSI down-cross: {round(rsi.iat[-1], 2)}")
+                        #
+                        body = {"symbol": symbol, "rsi": round(rsi.iat[-1], 2),
+                                "side" : "Short", "margin" : Bingx.rsi_short[level], 
+                                "price" : close, "time" : t}
+                        from tasks import sender
+                        sender(body=json.dumps(body))
+            
+            cross_up()
+            cross_down()
+            
+            
+            
+            print(symbol, close, round(rsi.iat[-1], 2), Bingx.close[symbol][1], Bingx.close[symbol][2])
         else:
             print("please wait, we are update klines.")
-            # request(Bingx)
+            # request_update_klines
     except Exception as e:
         logger.exception(f"{e}")
             
     
 
 def main_job(Bingx):
-    # symbols = ['BTC-USDT']
     symbols = Bingx.symbols
     start_bingx(symbols, Bingx)
 
