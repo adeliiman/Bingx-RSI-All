@@ -5,7 +5,7 @@ from logging.handlers import TimedRotatingFileHandler
 
 
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
-LOG_FILE = "Bingx.log"
+LOG_FILE = "logs/Bingx.log"
 
 def get_console_handler():
    console_handler = logging.StreamHandler(sys.stdout)

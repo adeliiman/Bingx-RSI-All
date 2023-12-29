@@ -143,6 +143,7 @@ class BingXApi:
             paramsStr = self.praseParam(paramsMap)
             return self.send_request(method, path, paramsStr, payload)
 
+
         def getOrders(self, symbol):  # --> 'data': {'orders': None}
             payload = {}
             path = 'GET /openApi/swap/v2/trade/openOrders'
@@ -164,96 +165,6 @@ class BingXApi:
             return self.send_request(method, path, paramsStr, payload)
 
 
-        # def getStopOrders(self, symbol): #--> 'data': {'orders': []}
-        #     paramsMap = {
-        #         "symbol": symbol,
-        #         "apiKey": self.APIKEY,
-        #         "timestamp": int(time.time()*1000),
-        #     }
-        #     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in paramsMap ])
-        #     paramsStr += "&sign=" + self.genSignature("/api/v1/user/pendingStopOrders", "POST", paramsMap)
-        #     url = "%s/api/v1/user/pendingStopOrders?" % self.APIURL
-        #     return self.post(url, paramsStr)
-
-
-        # def placeStopOrder(self, positionId, stopLossPrice, takeProfitPrice, volume, orderId):
-        #     paramsMap = {
-        #         "apiKey": self.APIKEY,
-        #         "positionId": positionId,
-        #         "stopLossPrice": stopLossPrice,
-        #         "takeProfitPrice": takeProfitPrice,
-        #         "entrustVolume": volume,
-        #         "orderId": orderId,
-        #         "timestamp": int(time.time()*1000),
-        #     }
-        #     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in paramsMap])
-        #     paramsStr += "&sign=" + self.genSignature("/api/v1/user/stopOrder", "POST", paramsMap)
-        #     url = "%s/api/v1/user/stopOrder?" % self.APIURL
-        #     return self.post(url, paramsStr)
-
-
-        # def closePosition(self, symbol, positionId):
-        #     paramsMap = {
-        #         "symbol": symbol,
-        #         "positionId": positionId,
-        #         "apiKey": self.APIKEY,
-        #         "timestamp": int(time.time()*1000),
-        #     }
-        #     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in paramsMap])
-        #     paramsStr += "&sign=" + self.genSignature("/api/v1/user/oneClickClosePosition", "POST", paramsMap)
-        #     url = "%s/api/v1/user/oneClickClosePosition?" % self.APIURL
-        #     return self.post(url, paramsStr)
-
-
-        # def closeOrder(self, symbol, orderId):
-        #     paramsMap = {
-        #         "orderId": orderId,
-        #         "symbol": symbol,
-        #         "apiKey": self.APIKEY,
-        #         "timestamp": int(time.time()*1000)
-        #     }
-        #     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in paramsMap])
-        #     paramsStr += "&sign=" + self.genSignature("/api/v1/user/cancelOrder", "POST", paramsMap)
-        #     url = "%s/api/v1/user/cancelOrder?" % self.APIURL
-        #     return self.post(url, paramsStr)
-
-
-        # def closeStopOrder(self, symbol, orderId):
-        #     paramsMap = {
-        #         "orderId": orderId,
-        #         "symbol": symbol,
-        #         "apiKey": self.APIKEY,
-        #         "timestamp": int(time.time()*1000)
-        #     }
-        #     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in paramsMap])
-        #     paramsStr += "&sign=" + self.genSignature("/api/v1/user/cancelStopOrder", "POST", paramsMap)
-        #     url = "%s/api/v1/user/cancelStopOrder?" % self.APIURL
-        #     return self.post(url, paramsStr)
-
-
-        # def closeAllOrders(self):
-        #     paramsMap = {
-        #         "apiKey": self.APIKEY,
-        #         "timestamp": int(time.time()*1000),
-        #     }
-        #     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in paramsMap])
-        #     paramsStr += "&sign=" + self.genSignature("/api/v1/user/cancelAll", "POST", paramsMap)
-        #     url = "%s/api/v1/user/cancelAll?" % self.APIURL
-        #     return self.post(url, paramsStr)
-
-
-        # def setMarginMode(self, symbol, marginMode):
-        #     # marginMode: Isolated / Cross
-        #     paramsMap = {
-        #         "symbol": symbol,
-        #         "marginMode": marginMode,
-        #         "apiKey": self.APIKEY,
-        #         "timestamp": int(time.time()*1000),
-        #     }
-        #     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in paramsMap])
-        #     paramsStr += "&sign=" + self.genSignature("/api/v1/user/setMarginMode", "POST", paramsMap)
-        #     url = "%s/api/v1/user/setMarginMode?" % self.APIURL
-        #     return self.post(url, paramsStr)
 
     except Exception as e:
         print(e)
@@ -288,10 +199,19 @@ class BingXApi:
 # print(api.placeOrder(symbol="BTC-USDT", side="SELL",positionSide="LONG", stopPrice='36500', price=37000, quantity=0.0001, tradeType='TAKE_PROFIT'))
 # print(api.placeOrder(symbol="BTC-USDT", side="SELL",positionSide="LONG", stopPrice='36500', price=37000, quantity=0.0001, tradeType='TRAILING_STOP_MARKET'))
 
-# take_profit = "{\"type\": \"TAKE_PROFIT_MARKET\", \"quantity\": 0.0001,\"stopPrice\": 36000,\"price\": 36000,\"workingType\":\"MARK_PRICE\"}"
-# print(api.placeOrder(symbol="BTC-USDT",side= "SELL",positionSide= "SHORT",tradeType= "MARKET",quoteOrderQty=12.125,quantity=0.0001,
+# take_profit = "{\"type\": \"TAKE_PROFIT_MARKET\", \"quantity\": 0.1,\"stopPrice\": 1000,\"price\": 1000,\"workingType\":\"MARK_PRICE\"}"
+# print(api.placeOrder(symbol="ETH-USDT",side= "SELL",positionSide= "SHORT",tradeType= "MARKET",
+#                      quoteOrderQty=100, quantity=0.1,
 #                      takeProfit=take_profit))
 
+# take_profit = "{\"type\": \"TAKE_PROFIT_MARKET\", \"quantity\": %s,\"stopPrice\": %s,\"price\": %s,\"workingType\":\"MARK_PRICE\"}"% (0.013, 1000, 1000)
+# stop_loss = "{\"type\": \"STOP_MARKET\", \"quantity\": %s,\"stopPrice\": %s,\"price\": %s,\"workingType\":\"MARK_PRICE\"}"% (0.013, 3000, 3000)
+# res = api.placeOrder(symbol="ETH-USDT", side="SELL", positionSide=f"SHORT", tradeType="MARKET", 
+#             quantity=0.013, 
+#             quoteOrderQty=100,
+#             takeProfit=take_profit,
+#             stopLoss=stop_loss)
+# print(res)
 # print(api.setLeverage("BTC-USDT", "LONG", '20'))
 # print(api.setMarginMode("BTC-USDT", "Isolated"))
 
