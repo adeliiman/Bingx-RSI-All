@@ -16,11 +16,13 @@ class Setting(Base):
     TP_percent = Column(Float, default=1)
     SL_percent = Column(Float, default=1)
     use_symbols = Column(String, default='all-symbols')
+    reset = Column(Boolean, default=False)
 
 
 class SettingAdmin(ModelView, model=Setting):
     #form_columns = [User.name]
-    column_list = [Setting.timeframe, Setting.leverage, Setting.TP_percent, Setting.SL_percent, Setting.use_symbols]
+    column_list = [Setting.timeframe, Setting.leverage, Setting.TP_percent, Setting.SL_percent,
+                    Setting.use_symbols, Setting.reset]
     name = "Setting"
     name_plural = "Setting"
     icon = "fa-solid fa-user"

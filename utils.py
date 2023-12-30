@@ -71,6 +71,11 @@ def get_user_params(db: Session):
             for symbol in all_symbols:
                 Bingx.symbols.append(symbol.symbol)
             
+        if user.reset:
+            Bingx.entry_rsi = []
+            Bingx.entry_time = 0
+            Bingx.position = ''
+            logger.info("reset rsi data.")
         #
         get_all_klines(Bingx.symbols)
             
