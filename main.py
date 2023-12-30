@@ -89,7 +89,15 @@ def schedule_kline():
 
 	delta(Bingx.entry_time)
 
+	def reset_rsi_levels():
+		if len(Bingx.entry_rsi) == len(Bingx.rsi_long_levels) + len(Bingx.rsi_short_levels):
+			
+			logger.info(f"{Bingx.position}---All levels done. reset ...")
+			Bingx.position = ""
+			Bingx.entry_rsi = []
+			Bingx.entry_time = 0
 
+	reset_rsi_levels()
 
 def schedule_job():
 

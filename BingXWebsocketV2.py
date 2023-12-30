@@ -22,26 +22,13 @@ class BingxWS:
         self.sub = sub
         self.Bingx = Bingx
         self.ws = None
-        self.listenKey = ''
-        self.extendListenKeyStatus = False
         self.APIKEY = config['api_key']
         self.headers = {
             'Host': 'open-api-swap.bingx.com',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X -1_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
         }
         
-    def getListenKey(self):
-        headers = {"X-BX-APIKEY" : self.APIKEY}
-        res = requests.post("https://open-api.bingx.com/openApi/user/auth/userDataStream", headers=headers)
-        self.listenKey = res.json()['listenKey']
-        return self.listenKey
-    
-    def extendListenKey(self):
-        headers = {"X-BX-APIKEY" : self.APIKEY}
-        res = requests.put(f"https://open-api.bingx.com/openApi/user/auth/userDataStream?listenKey={self.listenKey}", headers=headers)
-        #print("extendListenKey:......", res)
-        return res
-    
+
 
     def on_open(self, ws):
         #sub = {"id":"BTCUSDT-klin_1m", "reqType": "sub", "dataType":"BTC-USDT@kline_1m"}
@@ -84,8 +71,7 @@ class BingxWS:
 
     def start(self):
         #websocket.enableTrace(True)
-        listenKey = self.getListenKey()
-        self.ws = websocket.WebSocketApp(url=self.url+f"?listenKey={listenKey}", 
+        self.ws = websocket.WebSocketApp(url=self.url, 
                                 on_open=self.on_open, 
                                 on_close=self.on_close,
                                 on_message=self.on_message,
