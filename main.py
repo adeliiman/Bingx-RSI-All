@@ -73,7 +73,10 @@ def schedule_kline():
 		# from tasks import update_klines
 		# update_klines()
 		from utils import update_all_klines
-		update_all_klines(symbols=Bingx.symbols)
+		if Bingx.position:
+			update_all_klines(symbols=[Bingx.position])
+		else:
+			update_all_klines(symbols=Bingx.symbols)
 		
 
 	def delta(t):
