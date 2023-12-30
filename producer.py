@@ -2,7 +2,7 @@ import pika, time
 
 
 
-def sender(body):
+def publish(body):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
     channel.queue_declare(queue='bingx')

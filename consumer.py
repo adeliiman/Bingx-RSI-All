@@ -42,7 +42,7 @@ def main():
     channel.start_consuming()
 
 threading.Thread(target=main).start()
-# threading.Thread(target=main).start()
+threading.Thread(target=main).start()
 
 
 

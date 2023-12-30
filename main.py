@@ -131,8 +131,8 @@ def cross_up(symbol, close, rsi, time_):
 					"margin" : Bingx.rsi_long[level], 
 					"price" : close, "time_" : time_}
 			
-			from tasks import sender
-			sender(body=json.dumps(body))
+			from producer import publish
+			publish(body=json.dumps(body))
 
 
 def cross_down(symbol, close, rsi, time_):
@@ -149,8 +149,8 @@ def cross_down(symbol, close, rsi, time_):
 					"side" : "SELL", "positionSide" : "SHORT",
 					"margin" : Bingx.rsi_short[level], 
 					"price" : close, "time_" : time_}
-			from tasks import sender
-			sender(body=json.dumps(body))
+			from producer import publish
+			publish(body=json.dumps(body))
 
 
 def placeOrder(symbol, side, positionSide, price, margin, qty, rsi, time_):
