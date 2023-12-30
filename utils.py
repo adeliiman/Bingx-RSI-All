@@ -16,7 +16,7 @@ def kline(items):
     symbol = items[0]
     interval = items[1]
     res = api.getKline(symbol=symbol, interval=interval, limit=400)
-    print(symbol, res['code'])
+    # print(symbol, res['code'])
     close = []
     for data in res['data']:
         close.append(float(data['close']))
