@@ -59,9 +59,9 @@ def schedule_kline():
 		kline = True
 	elif Bingx.timeframe == "30m" and (min_ % 30 == 0):
 		kline = True
-	elif Bingx.timeframe == "1h" and (hour_ == 0):
+	elif Bingx.timeframe == "1h" and (min_ == 0):
 		kline = True
-	elif Bingx.timeframe == "4h" and (hour_ % 4 == 0):
+	elif Bingx.timeframe == "4h" and (hour_ % 4 == 0) and (min_ == 0):
 		kline = True
 	
 	if kline:
