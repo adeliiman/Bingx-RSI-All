@@ -27,12 +27,20 @@ def main():
             qty = margin / price
             rsi = data['rsi']
             time_ = data['time_']
+            rsi_level = data['rsi_level']
+            leverage = data['leverage']
+            margin_mode = data['margin_mode']
+            TP = data['TP']
+            SL = data['SL']
 
             from main import placeOrder
             placeOrder(symbol=symbol, side=side, 
                     positionSide=positionSide, 
                     price=price, margin=margin,
-                    qty=qty, rsi=rsi, time_=time_)
+                    qty=qty, rsi=rsi, time_=time_, rsi_level=rsi_level,
+					leverage=leverage, margin_mode=margin_mode,
+					TP=TP, SL=SL
+					)
         except Exception as e:
             logger.exception(f"{e}")
 

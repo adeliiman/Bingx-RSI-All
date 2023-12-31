@@ -46,8 +46,7 @@ def get_user_params(db: Session):
         user_symbols = db.query(UserSymbols).all()
         
         Bingx.timeframe = user.timeframe
-        Bingx.TP_percent = user.TP_percent
-        Bingx.SL_percent = user.SL_percent
+        Bingx.margin_mode = user.margin_mode
         Bingx.leverage = user.leverage
         Bingx.use_symbols = user.use_symbols
 
@@ -55,9 +54,9 @@ def get_user_params(db: Session):
         Bingx.rsi_long = {}
         for conf in config:
             if conf.side == "Long":
-                Bingx.rsi_long[conf.rsi_level] = conf.margin
+                Bingx.rsi_long[conf.rsi_level] = {'margin':conf.margin, 'TP':conf.TP_percent, 'SL':conf.SL_percent}
             elif conf.side == "Short":
-                Bingx.rsi_short[conf.rsi_level] = conf.margin
+                Bingx.rsi_short[conf.rsi_level] = {'margin':conf.margin, 'TP':conf.TP_percent, 'SL':conf.SL_percent}
 
         Bingx.rsi_long_levels = sorted(Bingx.rsi_long)
         Bingx.rsi_short_levels = sorted(Bingx.rsi_short)

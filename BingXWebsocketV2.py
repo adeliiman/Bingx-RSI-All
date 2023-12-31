@@ -116,7 +116,7 @@ def handler(data, Bingx):
                 cross_up(symbol, close, rsi, time_)
                 cross_down(symbol, close, rsi, time_)
                 
-                print(symbol, close, round(rsi.iat[-1], 2), Bingx.close[symbol][1], Bingx.close[symbol][2])
+                print(symbol, close, round(rsi.iat[-1], 4), Bingx.close[symbol][1], Bingx.close[symbol][2])
           
         else:
             print("please wait, update klines ... ... ...")

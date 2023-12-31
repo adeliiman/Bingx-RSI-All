@@ -13,22 +13,26 @@ class Setting(Base):
     id = Column(Integer,primary_key=True)  
     timeframe = Column(String, default='15m')
     leverage = Column(Integer, default=10)
-    TP_percent = Column(Float, default=1)
-    SL_percent = Column(Float, default=1)
+    # TP_percent = Column(Float, default=1)
+    # SL_percent = Column(Float, default=1)
+    margin_mode = Column(String, default='ISOLATED')
     use_symbols = Column(String, default='all-symbols')
     reset = Column(Boolean, default=False)
 
 
+
 class SettingAdmin(ModelView, model=Setting):
     #form_columns = [User.name]
-    column_list = [Setting.timeframe, Setting.leverage, Setting.TP_percent, Setting.SL_percent,
+    column_list = [Setting.timeframe, Setting.leverage, Setting.margin_mode,
                     Setting.use_symbols, Setting.reset]
     name = "Setting"
     name_plural = "Setting"
     icon = "fa-solid fa-user"
     form_args = dict(timeframe=dict(default="15m", choices=["15m", "5m", "1h", "4h", "1m", "3m"]), 
-                     use_symbols=dict(default='All-symbols', choices=["all-symbols", "user-symbols"]))
-    form_overrides =  dict(timeframe=wtforms.SelectField, use_symbols=wtforms.SelectField)
+                     use_symbols=dict(default='All-symbols', choices=["all-symbols", "user-symbols"]),
+                     margin_mode=dict(default='ISOLATED', choices=['ISOLATED', 'CROSSED']))
+    form_overrides =  dict(timeframe=wtforms.SelectField, use_symbols=wtforms.SelectField,
+                           margin_mode=wtforms.SelectField)
 
     # async def on_model_change(self, data, model, is_created):
     #     # Perform some other action
@@ -100,13 +104,16 @@ class Config(Base):
     id = Column(Integer,primary_key=True)  
     side = Column(String)
     rsi_level = Column(Integer)
+    TP_percent = Column(Float)
+    SL_percent = Column(Float)
     margin = Column(Integer)
 
 
 
 class ConfigAdmin(ModelView, model=Config):
     #form_columns = [User.name]
-    column_list = [Config.side, Config.rsi_level, Config.margin
+    column_list = [Config.side, Config.rsi_level, Config.margin,
+                   Config.TP_percent, Config.SL_percent
                    ]
     name = "Config"
     name_plural = "Config"

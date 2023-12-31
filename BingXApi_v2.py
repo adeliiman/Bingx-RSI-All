@@ -2,7 +2,10 @@ import requests, json, time, math
 import hmac, hashlib, base64, urllib
 import time
 import json
+from setLogger import get_logger
 
+
+logger = get_logger(__name__)
 
 
 with open('config.json') as f:
@@ -165,14 +168,26 @@ class BingXApi:
             return self.send_request(method, path, paramsStr, payload)
 
 
-
+        def setMarginMode(self, symbol, mode):
+            payload = {}
+            path = '/openApi/swap/v2/trade/marginType'
+            method = "POST"
+            paramsMap = {
+            "symbol": symbol,
+            "marginType": mode, # ISOLATED/CROSSED
+            }
+            paramsStr = self.praseParam(paramsMap)
+            return self.send_request(method, path, paramsStr, payload)
+    
     except Exception as e:
-        print(e)
+        logger.exception(f"{e}")
 
 
 
 
-# api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=True)
+
+# api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=False)
+# print(api.setMarginMode("BTC-USDT", "ISOLATED"))
 # print(api.info()['data'][0])
 
 # # print(api.getServerTime())
@@ -213,7 +228,7 @@ class BingXApi:
 #             stopLoss=stop_loss)
 # print(res)
 # print(api.setLeverage("BTC-USDT", "LONG", '20'))
-# print(api.setMarginMode("BTC-USDT", "Isolated"))
+
 
 
 

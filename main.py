@@ -23,9 +23,8 @@ class BingX:
 	bot: str = 'Stop' # 'Run'
 	kline : bool =  False
 	timeframe: str = ''
-	leverage: int = 10
-	TP_percent: float = 2
-	SL_percent: float = 1
+	leverage: int 
+	margin_mode: str = "Isolated"
 	symbols: list = []
 
 	use_symbols : str = "all-symbols"
@@ -128,8 +127,11 @@ def cross_up(symbol, close, rsi, time_):
 			# symbol, rsi, side, margin, price, time
 			body = {"symbol": symbol, "rsi": round(rsi.iat[-1], 2),
 					"side" : "BUY", "positionSide": "LONG",
-					"margin" : Bingx.rsi_long[level], 
-					"price" : close, "time_" : time_}
+					"margin" : Bingx.rsi_long[level]['margin'], 
+					"price" : close, "time_" : time_, "rsi_level":level,
+					'leverage':Bingx.leverage, 'margin_mode':Bingx.margin_mode,
+					'TP':Bingx.rsi_long[level]['TP'],
+					'SL':Bingx.rsi_long[level]['SL']}
 			
 			from producer import publish
 			publish(body=json.dumps(body))
@@ -143,28 +145,35 @@ def cross_down(symbol, close, rsi, time_):
 			Bingx.entry_rsi.append(level)
 			if not Bingx.entry_time:
 				Bingx.entry_time = time_
-			logger.info(f"RSI up-cross: {symbol}---{round(rsi.iat[-1], 2)}---{level}---{time_}")
+			logger.info(f"RSI down-cross: {symbol}---{round(rsi.iat[-1], 2)}---{level}---{time_}")
 			#
 			body = {"symbol": symbol, "rsi": round(rsi.iat[-1], 2),
 					"side" : "SELL", "positionSide" : "SHORT",
-					"margin" : Bingx.rsi_short[level], 
-					"price" : close, "time_" : time_}
+					"margin" : Bingx.rsi_short[level]['margin'], 
+					"price" : close, "time_" : time_, "rsi_level":level,
+					'leverage':Bingx.leverage, 'margin_mode':Bingx.margin_mode,
+					'TP':Bingx.rsi_short[level]['TP'],
+					'SL':Bingx.rsi_short[level]['SL']}
 			from producer import publish
 			publish(body=json.dumps(body))
 
 
-def placeOrder(symbol, side, positionSide, price, margin, qty, rsi, time_):
+def placeOrder(symbol, side, positionSide, price, margin, qty, rsi, time_, rsi_level,
+			   leverage, margin_mode, TP, SL):
+	res = api.setLeverage(symbol=symbol, side=positionSide, leverage=leverage)
+	logger.info(f"set leverage {res}")
+
 	if side == "BUY":
-		TP = price * (1 + Bingx.TP_percent/100)
-		SL = price * (1 - Bingx.SL_percent/100)
+		TP = price * (1 + TP/100)
+		SL = price * (1 - SL/100)
 	else:
-		TP = price * (1 - Bingx.TP_percent/100)
-		SL = price * (1 + Bingx.SL_percent/100)
+		TP = price * (1 - TP/100)
+		SL = price * (1 + SL/100)
 	# print(symbol, side, margin, Bingx.TP_percent, Bingx.SL_percent)
 	logger.info(f"{symbol}---{side}---{price}---{margin}---{rsi}---{qty}")
 
-	res = api.setLeverage(symbol=symbol, side=positionSide, leverage=Bingx.leverage)
-	logger.info(f"set leverage {res}")
+	res = api.setMarginMode(symbol=symbol, mode=margin_mode)
+	logger.info(f"set margin type: {res}")
 
 	take_profit = "{\"type\": \"TAKE_PROFIT_MARKET\", \"quantity\": %s,\"stopPrice\": %s,\"price\": %s,\"workingType\":\"MARK_PRICE\"}"% (qty, TP, TP)
 	stop_loss = "{\"type\": \"STOP_MARKET\", \"quantity\": %s,\"stopPrice\": %s,\"price\": %s,\"workingType\":\"MARK_PRICE\"}"% (qty, SL, SL)
