@@ -58,8 +58,8 @@ def get_user_params(db: Session):
             elif conf.side == "Short":
                 Bingx.rsi_short[conf.rsi_level] = {'margin':conf.margin, 'TP':conf.TP_percent, 'SL':conf.SL_percent}
 
-        Bingx.rsi_long_levels = sorted(Bingx.rsi_long)
-        Bingx.rsi_short_levels = sorted(Bingx.rsi_short)
+        Bingx.rsi_long_levels = sorted(Bingx.rsi_long) # ascending
+        Bingx.rsi_short_levels = sorted(Bingx.rsi_short, reverse=True) #descending
         
         Bingx.symbols = []
         if Bingx.use_symbols == "user-symbols":

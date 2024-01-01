@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 with open('config.json') as f:
     config = json.load(f)
 
-api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=True)
+api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=False)
 
 
 class BingX:
@@ -117,8 +117,8 @@ def schedule_job():
 
 def cross_up(symbol, close, rsi, time_):
 	for level in Bingx.rsi_long_levels:
-		if round(rsi.iat[-1], 2) > level and round(rsi.iat[-2], 2) < level and\
-			level not in Bingx.entry_rsi:
+		# if round(rsi.iat[-1], 2) > level and round(rsi.iat[-2], 2) < level and\
+		if round(rsi.iat[-1], 2) < level  and level not in Bingx.entry_rsi:
 			Bingx.position = symbol
 			Bingx.entry_rsi.append(level)
 			if not Bingx.entry_time:
@@ -139,8 +139,8 @@ def cross_up(symbol, close, rsi, time_):
 
 def cross_down(symbol, close, rsi, time_):
 	for level in Bingx.rsi_short_levels:
-		if round(rsi.iat[-1], 2) < level and round(rsi.iat[-2], 2) > level and\
-			level not in Bingx.entry_rsi:
+		# if round(rsi.iat[-1], 2) < level and round(rsi.iat[-2], 2) > level and\
+		if round(rsi.iat[-1], 2) > level and level not in Bingx.entry_rsi:
 			Bingx.position = symbol
 			Bingx.entry_rsi.append(level)
 			if not Bingx.entry_time:
