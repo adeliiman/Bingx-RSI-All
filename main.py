@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 with open('config.json') as f:
     config = json.load(f)
 
-api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=False)
+api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=True)
 
 
 class BingX:
@@ -189,9 +189,11 @@ def placeOrder(symbol, side, positionSide, price, margin, qty, rsi, time_, rsi_l
 	signal.symbol = symbol
 	signal.side = side
 	signal.price = price
-	signal.time = datetime.fromtimestamp(time_/1000)
+	# signal.time = datetime.fromtimestamp(time_/1000)
+	signal.time = datetime.now().strftime('%y-%m-%d %H:%M:%S')
+	signal.rsi_level = rsi_level
 	db = SessionLocal()
 	db.add(signal)
 	db.commit()
 	db.close()
-	logger.info(f"load to sqlite. {symbol}---{side}---{datetime.fromtimestamp(time_/1000)}")
+	logger.info(f"load to sqlite. {symbol}---{side}---{datetime.now().strftime('%y-%m-%d %H:%M:%S')}")

@@ -53,14 +53,15 @@ class Signal(Base):
     side = Column(String)
     price = Column(Float)
     time = Column(String)
+    rsi_level = Column(Integer)
 
 
 class SignalAdmin(ModelView, model=Signal):
-    column_list = [Signal.id, Signal.symbol, Signal.side, Signal.price, Signal.time]
-    column_searchable_list = [Signal.symbol, Signal.side, Signal.time, Signal.price]
+    column_list = [Signal.id, Signal.symbol, Signal.side, Signal.price, Signal.time, Signal.rsi_level]
+    column_searchable_list = [Signal.symbol, Signal.side, Signal.time, Signal.price, Signal.rsi_level]
     #icon = "fa-chart-line"
     icon = "fas fa-chart-line"
-    column_sortable_list = [Signal.id, Signal.time, Signal.price, Signal.symbol, Signal.side]
+    column_sortable_list = [Signal.id, Signal.time, Signal.price, Signal.symbol, Signal.side, Signal.rsi_level]
     # column_formatters = {Signal.level0 : lambda m, a: round(m.level0,4),
     #                      Signal.level1 : lambda m, a: round(m.level1,4),
     #                      Signal.level2 : lambda m, a: round(m.level2,4),
