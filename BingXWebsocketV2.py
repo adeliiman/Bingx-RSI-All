@@ -108,7 +108,7 @@ def handler(data, Bingx):
             close = float(data['data'][0]['c'])
             time_ = data['data'][0]['T']
             # print(symbol)
-            if not Bingx.position or (Bingx.position == symbol):
+            if (not Bingx.position or (Bingx.position == symbol)):
                 df = pd.DataFrame([close, *Bingx.close[symbol][1:]][::-1], columns=['close'])
                 rsi = ta.rsi(close=df['close'], length=14)
                 

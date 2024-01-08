@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 with open('config.json') as f:
     config = json.load(f)
 
-api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=True)
+api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=False)
 
 
 class BingX:
@@ -37,7 +37,9 @@ class BingX:
 
 	position : str = ''
 	entry_rsi : list = []
-	entry_time : int = 0
+	entry_time : dict = {}
+
+	black_list_symbols : dict = {}
       
 
 Bingx = BingX()
@@ -77,19 +79,20 @@ def schedule_kline():
 		else:
 			update_all_klines(symbols=Bingx.symbols)
 		
-
-	def delta(t):
+	def delta(t, sym):
 		if t != 0:
 			tm = datetime.fromtimestamp(t/1000)
 			delta=datetime.now() - tm
-			print(delta.days)
 			if delta.days >= 1:
 				logger.info("24-Hours pass from entry")
-				Bingx.position = ""
-				Bingx.entry_rsi = []
-				Bingx.entry_time = 0
-
-	delta(Bingx.entry_time)
+				# Bingx.position = ""
+				# Bingx.entry_rsi = []
+				Bingx.entry_time[sym] = 0
+				for d in Bingx.black_list_symbols:
+					if sym in d:
+						Bingx.black_list_symbols.pop(d)
+	for sym in Bingx.entry_time:
+		delta(Bingx.entry_time[sym], sym)
 
 	def reset_rsi_levels():
 		if len(Bingx.entry_rsi) == len(Bingx.rsi_long_levels) + len(Bingx.rsi_short_levels):
@@ -97,7 +100,7 @@ def schedule_kline():
 			logger.info(f"{Bingx.position}---All levels done. reset ...")
 			Bingx.position = ""
 			Bingx.entry_rsi = []
-			Bingx.entry_time = 0
+			# Bingx.entry_time = 0
 
 	reset_rsi_levels()
 
@@ -118,11 +121,13 @@ def schedule_job():
 def cross_up(symbol, close, rsi, time_):
 	for level in Bingx.rsi_long_levels:
 		# if round(rsi.iat[-1], 2) > level and round(rsi.iat[-2], 2) < level and\
-		if round(rsi.iat[-1], 2) < level  and level not in Bingx.entry_rsi:
+		if round(rsi.iat[-1], 2) < level  and level not in Bingx.entry_rsi\
+			and not Bingx.black_list_symbols.get(symbol+'_'+str(level)):
+			Bingx.black_list_symbols[symbol+'_'+str(level)] = True
 			Bingx.position = symbol
 			Bingx.entry_rsi.append(level)
-			if not Bingx.entry_time:
-				Bingx.entry_time = time_
+			if not Bingx.entry_time.get(symbol):
+				Bingx.entry_time[symbol] = time_
 			logger.info(f"RSI up-cross: {symbol}---{round(rsi.iat[-1], 2)}---{level}---{time_}")
 			# symbol, rsi, side, margin, price, time
 			body = {"symbol": symbol, "rsi": round(rsi.iat[-1], 2),
@@ -140,11 +145,13 @@ def cross_up(symbol, close, rsi, time_):
 def cross_down(symbol, close, rsi, time_):
 	for level in Bingx.rsi_short_levels:
 		# if round(rsi.iat[-1], 2) < level and round(rsi.iat[-2], 2) > level and\
-		if round(rsi.iat[-1], 2) > level and level not in Bingx.entry_rsi:
+		if round(rsi.iat[-1], 2) > level and level not in Bingx.entry_rsi\
+			and not Bingx.black_list_symbols.get(symbol+'_'+str(level)):
+			Bingx.black_list_symbols[symbol+'_'+str(level)] = True
 			Bingx.position = symbol
 			Bingx.entry_rsi.append(level)
-			if not Bingx.entry_time:
-				Bingx.entry_time = time_
+			if not Bingx.entry_time.get(symbol):
+				Bingx.entry_time[symbol] = time_
 			logger.info(f"RSI down-cross: {symbol}---{round(rsi.iat[-1], 2)}---{level}---{time_}")
 			#
 			body = {"symbol": symbol, "rsi": round(rsi.iat[-1], 2),
